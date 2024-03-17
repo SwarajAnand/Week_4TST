@@ -4,10 +4,30 @@ const container = document.getElementById("container");
 
 search.addEventListener("click", () => {
   console.log(inputbox.value);
+  let phone = inputbox.value;
+  showPhones(phone);
 });
 
-// https://openapi.programming-hero.com/api/phones?search=13
+const activeEvent = () => {
+  document.querySelectorAll("#showMoreBtn").forEach((ele, idx) => {
+    console.log(ele);
+    ele.addEventListener("click", (e) => {
+      let detailPhone = phoneArr[idx].slug;
+      console.log(detailPhone);
+      detailedReview(detailPhone);
+    });
+  });
+};
+// Working on this function activeEvent & detailedReview
+async function detailedReview(detailedName) {
+  let res = await fetch(
+    `https://openapi.programming-hero.com/api/phone/${detailedName}`
+  );
+  let jsonData = await res.json();
+  let data = jsonData.data;
+}
 
+// Api Call with Promises
 // const showPhones = () => {
 //   fetch("https://openapi.programming-hero.com/api/phones?search=13")
 //     .then((res) => res.json())
@@ -16,7 +36,26 @@ search.addEventListener("click", () => {
 //     });
 // };
 
+// This is a function to display all the card shown
 function displayPhones(data) {
+  if (data.length > 9) {
+    let demoData = data.slice(0, 9);
+    showData(demoData);
+    document.querySelector(".showMoreSectionBtn").style.display = "block";
+    document
+      .querySelector(".showMoreSectionBtn")
+      .addEventListener("click", () => {
+        showData(data);
+        document.querySelector(".showMoreSectionBtn").style.display = "none";
+      });
+  } else {
+    showData(data);
+  }
+  activeEvent();
+}
+
+// This is a function to Create all the card data
+const showData = (data) => {
   container.innerHTML = "";
   data.forEach((phone, index) => {
     const div = document.createElement("div");
@@ -29,37 +68,9 @@ function displayPhones(data) {
     div.classList.add("cards");
     container.append(div);
   });
-
-  const div = document.createElement("div");
-  div.classList.add("DetailedInfo");
-  container.append(div);
-
-  activeEvent();
-}
-
-const activeEvent = () => {
-  document.querySelectorAll("#showMoreBtn").forEach((ele, idx) => {
-    // console.log(ele);
-    ele.addEventListener("click", (e) => {
-      let detailPhone = phoneArr[idx].slug;
-      console.log(detailPhone);
-      //   console.log(container.children[idx]);
-      //   showPhones(ele.classList[1]);
-      detailedReview(detailPhone);
-    });
-  });
 };
 
-async function detailedReview(detailedName) {
-  let res = await fetch(
-    `https://openapi.programming-hero.com/api/phone/${detailedName}`
-  );
-  let jsonData = await res.json();
-  let data = jsonData.data;
-  //   console.log(data);
-}
-
-// Function for showing the mobile phones and search query
+// Function for fetch the mobile phones using ASYNC AWAIT and pass the search Query API calls
 let phoneArr = [];
 async function showPhones(phone) {
   let res = await fetch(
@@ -67,31 +78,10 @@ async function showPhones(phone) {
   );
   let jsonData = await res.json();
   let data = jsonData.data;
-  //   console.log(data);
   phoneArr = data;
-  //   console.log(phoneArr);
   displayPhones(data);
 }
 
 window.onload = function () {
   showPhones(13);
 };
-
-// console.log("Working");
-
-// let fruits = [
-//   { name: "iPhone 13 mini" },
-//   { name: "AOrange" },
-//   { name: "Apple" },
-//   { name: "Mango" },
-// ];
-
-// let arrWithIndex = fruits.filter((ele) => {
-//   return ele.name.indexOf("13") !== -1;
-// });
-
-// console.log(arrWithIndex);
-// let arrWithIncludes = fruits.filter((ele) => {
-//   return ele.name.includes("13");
-// });
-// console.log(arrWithIncludes);
